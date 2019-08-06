@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h3 align="center">系统主页面</h3>
+<!-- /logout : 由Shiro提供的登录信息注销功能 -->
+<span style="margin-left: 1000px">
+    当前用户 : <shiro:principal property="username"/>
+    [
+    <shiro:hasRole name="admin">管理员</shiro:hasRole>
+    <shiro:hasRole name="teacher">教师</shiro:hasRole>
+    <shiro:hasRole name="student">学生</shiro:hasRole>
+    ]
+    <a href="/logout">注销</a></span>
+<br>
+<hr>
+<!-- /teaListView : 访问该页面需要用户进行身份认证及'stuListView:view'权限 -->
+学生信息管理页 : <a href="/stuListView">进入</a><br>
+<!-- /teaListtView : 访问该页面需要用户进行身份认证及'teacherView:view'权限 -->
+教师信息管理页 : <a href="/teaListView">进入</a>
+</body>
+</html>

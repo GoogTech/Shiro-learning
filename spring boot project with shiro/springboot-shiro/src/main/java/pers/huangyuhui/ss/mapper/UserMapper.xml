@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="pers.huangyuhui.ss.mapper.UserMapper">
+    <!--
+    select * from tb_user u,tb_role r,tb_permission p where u.rid=r.rid and p.rid=r.rid and u.username='admin'
+    -->
+    <resultMap id="userMap" type="pers.huangyuhui.ss.bean.User">
+        <id property="uid" column="uid"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <collection property="roles" ofType="pers.huangyuhui.ss.bean.Role">
+            <id property="rid" column="rid"/>
+            <result property="name" column="role_name"/>
+            <collection property="permissions" ofType="pers.huangyuhui.ss.bean.Permission">
+                <id property="pid" column="pid"/>
+                <result property="name" column="permission_name"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="findByName" parameterType="string" resultMap="userMap">
+        SELECT *
+        FROM tb_user u,
+             tb_role r,
+             tb_permission p
+        WHERE u.rid = r.rid
+          AND p.rid = r.rid
+          AND u.username = #{username}
+    </select>
+
+</mapper>
