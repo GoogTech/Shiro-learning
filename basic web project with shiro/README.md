@@ -614,19 +614,19 @@ public class EmployeeServlet extends HttpServlet {
 
 ### 案例截屏
 *用户登录页面 :*
-![](Shiro整合Web-一个简单的用户权限控制案例\Shiro整合web-用户登录页.PNG)
+![](https://raw.githubusercontent.com/YUbuntu0109/Shiro-learning/master/basic%20web%20project%20with%20shiro/screenshots/Shiro%E6%95%B4%E5%90%88web-%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E9%A1%B5.PNG)
 
 *用户主页面 :*
-![](Shiro整合Web-一个简单的用户权限控制案例\Shiro整合web-用户主页.PNG)
+![](https://raw.githubusercontent.com/YUbuntu0109/Shiro-learning/master/basic%20web%20project%20with%20shiro/screenshots/Shiro%E6%95%B4%E5%90%88web-%E7%94%A8%E6%88%B7%E4%B8%BB%E9%A1%B5.PNG)
 
 *管理员(`admin`)身份登录 : 部门信息管理页( 该用户拥有操控部门信息管理页的所有权限 )*
-![](Shiro整合Web-一个简单的用户权限控制案例\Shiro整合web-admin-部门信息管理页.PNG)
+![](https://raw.githubusercontent.com/YUbuntu0109/Shiro-learning/master/basic%20web%20project%20with%20shiro/screenshots/Shiro%E6%95%B4%E5%90%88web-admin-%E9%83%A8%E9%97%A8%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86%E9%A1%B5.PNG)
 
 *管理员(`admin`)身份登录 : 员工信息管理页( 该用户拥有操控员工信息管理页的所有权限 )*
-![](Shiro整合Web-一个简单的用户权限控制案例\Shiro整合web-admin-员工信息管理页.PNG)
+![](https://raw.githubusercontent.com/YUbuntu0109/Shiro-learning/master/basic%20web%20project%20with%20shiro/screenshots/Shiro%E6%95%B4%E5%90%88web-admin-%E5%91%98%E5%B7%A5%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86%E9%A1%B5.PNG)
 
 *普通用户(`yuhui`)身份登录 : 部门信息管理页( 该用户只具有部门信息管理页的`view`权限 )*
-![](Shiro整合Web-一个简单的用户权限控制案例\Shiro整合web-yuhui-部门信息管理页.PNG)
+![](https://raw.githubusercontent.com/YUbuntu0109/Shiro-learning/master/basic%20web%20project%20with%20shiro/screenshots/Shiro%E6%95%B4%E5%90%88web-yuhui-%E9%83%A8%E9%97%A8%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86%E9%A1%B5.PNG)
 
 *普通用户(`yuhui`)身份登录 : 员工信息管理页( 该用户并没有操控员工信息管理页的权限 )*
-![](Shiro整合Web-一个简单的用户权限控制案例\Shiro整合web-yuhui-员工信息管理页.PNG)
+![](https://raw.githubusercontent.com/YUbuntu0109/Shiro-learning/master/basic%20web%20project%20with%20shiro/screenshots/Shiro%E6%95%B4%E5%90%88web-yuhui-%E5%91%98%E5%B7%A5%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86%E9%A1%B5.PNG)
