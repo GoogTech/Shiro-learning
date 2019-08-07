@@ -1,5 +1,6 @@
 package pers.huangyuhui.ss.bean;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import java.util.Set;
  * @version: 1.0
  * @website: https://yubuntu0109.github.io/
  */
-public class User {
+public class User implements Serializable {
 
     private Integer uid;
     private String username;

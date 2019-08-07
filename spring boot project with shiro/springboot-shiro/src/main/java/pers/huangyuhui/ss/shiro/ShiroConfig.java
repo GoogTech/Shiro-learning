@@ -1,15 +1,14 @@
 package pers.huangyuhui.ss.shiro;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import org.apache.shiro.authc.credential.CredentialsMatcher;
+import net.sf.ehcache.CacheManager;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +18,7 @@ import java.util.Map;
  * @description: Shiro配置信息
  * @author: 黄宇辉
  * @date: 8/5/2019-7:41 AM
- * @version: 1.0
+ * @version: 1.1
  * @website: https://yubuntu0109.github.io/
  */
 @Configuration
@@ -32,12 +31,12 @@ public class ShiroConfig {
      * @return: org.apache.shiro.spring.web.ShiroFilterFactoryBean
      */
     @Bean
-    public ShiroFilterFactoryBean getShiroFilterFactoryBean(@Qualifier("securityManager") SecurityManager securityManager) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         //设置安全管理器
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         //设置自定义过滤器
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(getFilterChainDefinitionMap());
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap());
         //设置用户登录页,默认: http://localhost:8080/login.jsp
         shiroFilterFactoryBean.setLoginUrl("/loginView");
         //设置用户未授权操作提示页
@@ -52,10 +51,10 @@ public class ShiroConfig {
      * @return: pers.huangyuhui.ss.shiro.UserRealm
      */
     @Bean
-    public UserRealm getUserRealm(CredentialsMatcher credentialsMatcher) {
+    public UserRealm userRealm(HashedCredentialsMatcher hashedCredentialsMatcher) {
         UserRealm userRealm = new UserRealm();
-        //使用credentialsMatcher加密算法类来验证密文
-        userRealm.setCredentialsMatcher(credentialsMatcher);
+        //设置凭证匹配器
+        userRealm.setCredentialsMatcher(hashedCredentialsMatcher);
         return userRealm;
     }
 
@@ -65,26 +64,45 @@ public class ShiroConfig {
      * @date: 2019-08-05 7:53 AM
      * @return: org.apache.shiro.web.mgt.DefaultWebSecurityManager
      */
-    @Bean(name = "securityManager")
-    @DependsOn("credentialsMatcher")
-    public SecurityManager getSecurityManager(CredentialsMatcher credentialsMatcher) {
+    @Bean
+    public SecurityManager securityManager(UserRealm userRealm, EhCacheManager ehCacheManager) {
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
-        defaultWebSecurityManager.setRealm(getUserRealm(credentialsMatcher)); //关联realm
+        //关联自定义realm
+        defaultWebSecurityManager.setRealm(userRealm);
+        //关联缓存管理
+        defaultWebSecurityManager.setCacheManager(ehCacheManager);
         return defaultWebSecurityManager;
     }
 
     /**
-     * @description: 哈希密码比较器:比较用户登录时输入的密码,跟数据库密码配合盐值salt解密后是否一致
+     * @description: 哈希密码匹配器:比较用户登录时输入的密码,跟数据库密码配合盐值salt解密后是否一致
      * @date: 2019-08-05 9:01 PM
      * @return: org.apache.shiro.authc.credential.HashedCredentialsMatcher
      */
-    @Bean(name = "credentialsMatcher")
-    public HashedCredentialsMatcher getHashedCredentialsMatcher() {
+    @Bean
+    public HashedCredentialsMatcher hashedCredentialsMatcher() {
         HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
         hashedCredentialsMatcher.setHashAlgorithmName("md5"); //散列算法
         hashedCredentialsMatcher.setHashIterations(3); //散列的次数
         hashedCredentialsMatcher.setStoredCredentialsHexEncoded(true); //默认是true:Hex编码.false:Base64编码
         return hashedCredentialsMatcher;
+    }
+
+    /**
+     * @description: 设置缓存管理, 缓存用户及其权限信息
+     * @date: 2019-08-07 7:51 AM
+     * @return: org.apache.shiro.cache.ehcache.EhCacheManager
+     */
+    @Bean
+    public EhCacheManager ehCacheManager() {
+        //注意:myEhcache对应ehcache-shiro.xml中的'<ehcache name="myEhcache">'
+        CacheManager cacheManager = CacheManager.getCacheManager("myEhcache");
+        if (cacheManager == null) {
+            cacheManager = CacheManager.create();
+        }
+        EhCacheManager ehCacheManager = new EhCacheManager();
+        ehCacheManager.setCacheManager(cacheManager);
+        return ehCacheManager;
     }
 
 
@@ -93,7 +111,7 @@ public class ShiroConfig {
      * @date: 2019-08-05 8:31 AM
      * @return: java.util.Map
      */
-    private Map<String, String> getFilterChainDefinitionMap() {
+    private Map<String, String> filterChainDefinitionMap() {
         Map<String, String> filterMap = new LinkedHashMap<>();
         //需身份认证
         filterMap.put("/stuListView", "authc");
@@ -114,12 +132,12 @@ public class ShiroConfig {
 
 
     /**
-     * @description: 配置ShiroDialect,用于thymeleaf和shiro标签配合使用
+     * @description: 配置ShiroDialect, 用于thymeleaf和shiro标签配合使用
      * @date: 2019-08-05 6:37 PM
      * @return: at.pollux.thymeleaf.shiro.dialect.ShiroDialect
      */
     @Bean
-    public ShiroDialect getShiroDialect() {
+    public ShiroDialect shiroDialect() {
         return new ShiroDialect();
     }
 

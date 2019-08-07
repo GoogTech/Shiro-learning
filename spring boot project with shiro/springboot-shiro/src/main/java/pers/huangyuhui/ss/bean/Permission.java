@@ -1,5 +1,7 @@
 package pers.huangyuhui.ss.bean;
 
+import java.io.Serializable;
+
 /**
  * @project: springboot-shiro
  * @description: 权限信息
@@ -8,7 +10,7 @@ package pers.huangyuhui.ss.bean;
  * @version: 1.0
  * @website: https://yubuntu0109.github.io/
  */
-public class Permission {
+public class Permission implements Serializable {
 
     private Integer pid;
     private String name;
