@@ -1,7 +1,6 @@
 package pers.huangyuhui.ss.shiro;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import net.sf.ehcache.CacheManager;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -57,6 +56,13 @@ public class ShiroConfig {
         UserRealm userRealm = new UserRealm();
         //设置凭证匹配器
         userRealm.setCredentialsMatcher(hashedCredentialsMatcher);
+        //设置缓存
+        userRealm.setCachingEnabled(true); //是否启用缓存
+        userRealm.setAuthorizationCachingEnabled(true); //是否启用身份验证缓存
+        userRealm.setAuthorizationCacheName("authorization_cache"); //缓存AuthorizationInfo信息的缓存名称
+        userRealm.setAuthenticationCachingEnabled(true); //是否启用授权缓存
+        userRealm.setAuthenticationCacheName("authentication_cache"); //缓存AuthenticationInfo信息的缓存名称
+
         return userRealm;
     }
 
@@ -100,12 +106,15 @@ public class ShiroConfig {
     @Bean
     public EhCacheManager ehCacheManager() {
         //注意:myEhcache对应ehcache-shiro.xml中的'<ehcache name="myEhcache">'
-        CacheManager cacheManager = CacheManager.getCacheManager("myEhcache");
-        if (cacheManager == null) {
-            cacheManager = CacheManager.create();
-        }
+//      CacheManager cacheManager = CacheManager.getCacheManager("myEhcache");
+//      if (cacheManager == null) {
+//          cacheManager = CacheManager.create();
+//      }
+//      EhCacheManager ehCacheManager = new EhCacheManager();
+//      ehCacheManager.setCacheManager(cacheManager);
+//      return ehCacheManager;
         EhCacheManager ehCacheManager = new EhCacheManager();
-        ehCacheManager.setCacheManager(cacheManager);
+        ehCacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
         return ehCacheManager;
     }
 
