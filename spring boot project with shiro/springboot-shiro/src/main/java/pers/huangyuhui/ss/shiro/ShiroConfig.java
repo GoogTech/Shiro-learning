@@ -6,7 +6,9 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -65,12 +67,14 @@ public class ShiroConfig {
      * @return: org.apache.shiro.web.mgt.DefaultWebSecurityManager
      */
     @Bean
-    public SecurityManager securityManager(UserRealm userRealm, EhCacheManager ehCacheManager) {
+    public SecurityManager securityManager(UserRealm userRealm, EhCacheManager ehCacheManager, CookieRememberMeManager cookieRememberMeManager) {
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
         //关联自定义realm
         defaultWebSecurityManager.setRealm(userRealm);
-        //关联缓存管理
+        //关联缓存管理器
         defaultWebSecurityManager.setCacheManager(ehCacheManager);
+        //关联Cookie管理器
+        defaultWebSecurityManager.setRememberMeManager(cookieRememberMeManager);
         return defaultWebSecurityManager;
     }
 
@@ -107,6 +111,33 @@ public class ShiroConfig {
 
 
     /**
+     * @description: 设置Cookie管理器
+     * @param: simpleCookie
+     * @date: 2019-08-11 6:14 PM
+     * @return: org.apache.shiro.web.mgt.CookieRememberMeManager
+     */
+    @Bean
+    public CookieRememberMeManager cookieRememberMeManager(SimpleCookie simpleCookie) {
+        CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+        cookieRememberMeManager.setCookie(simpleCookie); //关联simpleCookie
+        return cookieRememberMeManager;
+    }
+
+    /**
+     * @description: 设置Cookie
+     * @date: 2019-08-11 6:07 PM
+     * @return: org.apache.shiro.web.servlet.SimpleCookie
+     */
+    @Bean
+    public SimpleCookie simpleCookie() {
+        SimpleCookie simpleCookie = new SimpleCookie();
+        simpleCookie.setName("userinfo");
+        simpleCookie.setMaxAge(60 * 60); //1h
+        simpleCookie.isHttpOnly(); //有助于减少某些类型的跨站点脚本攻击
+        return simpleCookie;
+    }
+
+    /**
      * @description: 设置资源的权限控制
      * @date: 2019-08-05 8:31 AM
      * @return: java.util.Map
@@ -125,6 +156,9 @@ public class ShiroConfig {
         //权限过滤:除身份认证外,还需要用户拥有对stuListView资源的view权限
         filterMap.put("/stuListView", "perms[stuListView:view]");
         filterMap.put("/teaListView", "perms[teaListView:view]");
+        //配置记住我或认证通过方可以访问的地址
+        filterMap.put("/index", "user");
+        filterMap.put("/", "user");
         //拦截需要登录(用户认证)方可访问的资源(一般将/**放在最下边,不然会导致所有url都被拦截哟)
         filterMap.put("/**", "authc");
         return filterMap;
