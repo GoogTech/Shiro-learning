@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <description>configuration informations about Shiro</description>
+
+    <!-- 配置shiroFilter:这里的id名(shiroFilter)要和web.xml配置的名字保持一致哟 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- 关联SecurityManage -->
+        <property name="securityManager" ref="securityManager"/>
+        <!-- 定义过虑器链,从上向下顺序执行,一般将/**放在最下边 -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!-- 防止过滤器拦截验证用户登录信息的请求(/login ) -->
+                /login=anon
+                <!-- 设置Shiro默认的注销请求:其具体的注销逻辑代码Shiro已经替我们实现了哟 -->
+                /logout=logout
+                <!-- 设置角色过滤 -->
+                /teaListView=roles[admin]
+                <!-- 设置请求权限过滤:除身份认证外,还需要用户拥有对stuListView/teaListView资源的view权限 -->
+                /stuListView=perms[stuListView:view]
+                /teaListView=perms[teaListView:view]
+                <!-- 所有资源的访问都需要身份认证 -->
+                /**=authc
+            </value>
+        </property>
+        <!-- 指定Shiro默认的登录请求,默认: http://localhost:8080/login.jsp -->
+        <property name="loginUrl" value="/loginView"/>
+        <!-- 指定用户未授权操作提示页 -->
+        <property name="unauthorizedUrl" value="/unauthorizedView"/>
+    </bean>
+
+    <!-- 自定义realm -->
+    <bean id="realm" class="pers.huangyuhui.shiro.shiro.UserRealm">
+        <!-- 用户凭证加密配置 -->
+        <property name="credentialsMatcher" ref="credentialsMatcher"/>
+        <!-- 是否启用缓存:默认为true -->
+        <property name="cachingEnabled" value="true"/>
+        <!-- 是否启用身份验证缓存 -->
+        <property name="authenticationCachingEnabled" value="true"/>
+        <!-- 缓存AuthenticationInfo信息的缓存名称 -->
+        <property name="authenticationCacheName" value="authenticationCache"/>
+        <!-- 是否启用授权缓存:缓存AuthorizationInfo信息 -->
+        <property name="authorizationCachingEnabled" value="true"/>
+        <!-- 缓存AuthorizationInfo信息的缓存名称 -->
+        <property name="authorizationCacheName" value="authorizationCache"/>
+    </bean>
+
+    <!-- Shiro安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!-- 注入自定义Realm -->
+        <property name="realm" ref="realm"/>
+        <!-- 注入缓存管理器 -->
+        <property name="cacheManager" ref="ehCacheManager"/>
+    </bean>
+
+    <!-- Shiro凭证匹配器:对登录用户的密码进行MD5加密,hashIterations是散列加密次数,盐值信息见:UserRealm.java -->
+    <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="MD5"/>
+        <property name="hashIterations" value="3"/>
+    </bean>
+
+    <!-- Shiro缓存管理器 -->
+    <bean id="ehCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <!-- 注入ehcache配置文件 -->
+        <property name="cacheManagerConfigFile" value="classpath:shiro-config/ehcache-shiro.xml"/>
+    </bean>
+
+    <!-- Shiro生命周期处理器 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+    <!-- 开启shiro注解模式:如果使用注解模式,必须采用cglib针对类进行代理 -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor">
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+</beans>

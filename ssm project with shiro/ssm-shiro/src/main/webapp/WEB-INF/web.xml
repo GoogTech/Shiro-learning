@@ -1,0 +1,50 @@
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<web-app>
+    <display-name>Archetype Created Web Application</display-name>
+    <description>configuration informations about web</description>
+
+    <!-- 启动Spring -->
+    <context-param>
+        <!-- 启动Spring: 加载Spring核心配置 -->
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring-config/applicationContext.xml</param-value>
+    </context-param>
+
+    <!--
+    配置Spring整合Shiro的过滤器:将拦截下来的请求交给Spring容器中名为'shiroFilter'(与filter-name同名)的bean处理
+    详情信息见:applicationContext-shiro.xml
+    -->
+    <filter>
+        <filter-name>shiroFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>shiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 启动Spring: 配置加载Spring文件的监听器 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- 启动Spring MVC -->
+    <servlet>
+        <!-- 配置Spring MVC的前端核心控制器 -->
+        <servlet-name>spring_mvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- 加载Spring MVC配置文件 -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring-config/springmvc-config.xml</param-value>
+        </init-param>
+        <!-- 服务器启动后立即加载Spring MVC配置文件 -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>spring_mvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+</web-app>
