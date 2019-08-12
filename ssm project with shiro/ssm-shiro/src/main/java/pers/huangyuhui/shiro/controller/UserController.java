@@ -40,12 +40,12 @@ public class UserController {
      * @return: java.lang.String
      */
     @RequestMapping("/login")
-    public String login(User user, Model model) {
-        System.out.println("[/login]------------>" + user.toString());
+    public String login(User user, boolean rememberMe, Model model) {
+        System.out.println("[/login]------------>" + user.toString() + "\nrememberMe------------>" + rememberMe);
         //获取Subject
         Subject subject = SecurityUtils.getSubject();
-        //封装用户数据
-        UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+        //封装用户数据,并设置rememberMe功能
+        UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword(), rememberMe);
         //执行登录
         try {
             subject.login(token);

@@ -17,6 +17,7 @@
     <form method="post" action="${pageContext.request.contextPath}/login">
         账户 : <input type="text" name="username"><br>
         密码 : <input type="password" name="password" style="margin-top: 20px"><br>
+        记住我 : <input type="checkbox" name="rememberMe"/>
         <input type="submit" style="margin-top: 20px" value="登录">
         <span style="color: red">${errorMsg}</span>
     </form>
